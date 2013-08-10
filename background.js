@@ -24,9 +24,14 @@ chrome.pageAction.onClicked.addListener(function(tab) {
                 });
             }).reduce(function(a, b) {
                 return a.concat(b);
-            });
-            links = 'url = ' + links.join('<br/>url = ');
-            window.open('javascript: document.write("' + configPrefix + links + '")');
+            }, []);
+            if (links.length) {
+                links = 'url = ' + links.join('<br/>url = ');
+                window.open('javascript: document.write("' + configPrefix + links + '")');
+            }
+            else {
+                alert('All the lectures marked as watched!');
+            }
         };
         chrome.tabs.executeScript(null, {
             code: '!' + script + '("' + curlConfigPrefix(authCookie, cookie.value) + '")'
