@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+
+    "name": "Coursera: Unwatched Resources",
+    "description": "Extract resource links from Coursera lectures webpage skipping already watched ones. Generate a Curl configuration file which enables fast batch download.",
+    "version": "0.5",
+
+    "icons": {
+        "128": "icon.png"
+    },
+
+    "permissions": [
+        "tabs", "activeTab", "cookies",
+        "*://coursera.org/"
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "page_action": {
+        "default_title": "Create Curl config for download",
+        "default_icon": "icon.png"
+    }
+}
