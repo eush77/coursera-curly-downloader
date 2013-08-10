@@ -10,4 +10,6 @@ Configuration file includes required authentication cookie and can be launched e
     cat >config
     curl --config config
 
-    cat |curl --config -
+```
+cat |curl --config -
+```
