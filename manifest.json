@@ -11,7 +11,7 @@
 
     "permissions": [
         "tabs", "activeTab", "cookies",
-        "*://coursera.org/"
+        "*://class.coursera.org/"
     ],
     "background": {
         "scripts": ["background.js"]

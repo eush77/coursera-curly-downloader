@@ -1,19 +1,16 @@
 var matcher = new RegExp('^https?://class.coursera.org/.*/lecture/index/?$');
-var courseraMain = function(url) {
-    return url.split('://')[0] + '://coursera.org';
-};
 
-var authCookie = 'CAUTH';
+var authCookie = 'session';
 var curlConfigPrefix = function(authCookie, authValue) {
     return ['remote-name-all',
             'remote-header-name',
             'location',
-            'cookie = ' + authCookie + '=' + authValue].join('<br/>') + '<br/><br/>';
+            'cookie: ' + authCookie + '=' + authValue].join('<br/>') + '<br/><br/>';
 };
 
 chrome.pageAction.onClicked.addListener(function(tab) {
     chrome.cookies.get({
-        url: courseraMain(tab.url),
+        url: tab.url,
         name: authCookie
     }, function(cookie) {
         var script = function(configPrefix) {
@@ -26,8 +23,9 @@ chrome.pageAction.onClicked.addListener(function(tab) {
                 return a.concat(b);
             }, []);
             if (links.length) {
-                links = 'url = ' + links.join('<br/>url = ');
-                window.open('javascript: document.write("' + configPrefix + links + '")');
+                links = 'url: ' + links.join('<br/>url: ');
+                // Links are urldecoded when followed
+                window.open(('data:text/html, ' + configPrefix + links).replace(/%/g, '%25'));
             }
             else {
                 alert('All the lectures marked as watched!');
