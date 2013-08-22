@@ -1,4 +1,4 @@
-var matcher = new RegExp('^https?://class.coursera.org/.*/lecture/index/?$');
+var matcher = new RegExp('^https?://class\.coursera\.org/.*/lecture/index/?$');
 
 var authCookie = 'session';
 var curlConfigPrefix = function(authCookie, authValue) {
