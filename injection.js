@@ -80,7 +80,7 @@ section.addEventListener('change', function(event) {
 
 // Listen for messages
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    switch (message) {
+    switch (message.type) {
     case 'extract':
         // Extract resource links for marked lectures.
         var arrayOfArrays = Object.keys(selected).filter(isFinite).sort(function(a, b) {

@@ -1,0 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    width: 60%;
+    margin: 0 auto;
+    background-color: #555;
+}
+textarea {
+    position: absolute;
+    top: 0;
+    bottom: 50%;
+    left: 20%;
+    right: 20%;
+    font-family: monospace;
+}

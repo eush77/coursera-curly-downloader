@@ -1,32 +1,54 @@
 var matcher = new RegExp('^https?://class\.coursera\.org/.*/lecture/index/?$');
-var AUTH_COOKIE = 'session';
+var authCookie = 'session';
 
-/** Curl config prefix
+// Message format used throughout the extension:
+//   {type: '<type>',  -- string name
+//    data: '<data>'}  -- any (JSONifiable) payload
+//
+
+/** Generate Curl config options
  * @param {String} authValue Authorization cookie value.
- * @returns {String}
+ * @returns {Array}
  */
-var curlConfigPrefix = function(authValue) {
+var curlOptions = function(authValue) {
     return ['remote-name-all',
             'remote-header-name',
             'location',
-            'cookie: ' + AUTH_COOKIE + '=' + authValue].join('<br/>') + '<br/><br/>';
+            'cookie: ' + authCookie + '=' + authValue];
 };
 
-// Set page-action button up
+/** Open output page and send given data
+ * @param {any} data
+ */
+var output = function(data) {
+    // One-time listener
+    var outputReadyListener = function self(message) {
+        if (message.type == 'output-ready') {
+            chrome.runtime.onMessage.removeListener(self);
+            chrome.runtime.sendMessage(null, {type: 'output', data: data});
+        }
+    };
+    chrome.runtime.onMessage.addListener(outputReadyListener);
+    window.open('output.html');
+};
+
+// Page-action button behavior
 chrome.pageAction.onClicked.addListener(function(tab) {
     chrome.cookies.get({
         url: tab.url,
-        name: AUTH_COOKIE
+        name: authCookie
     }, function(cookie) {
-        var configPrefix = curlConfigPrefix(cookie.value);
-        chrome.tabs.sendMessage(tab.id, 'extract', function(links) {
+        var options = curlOptions(cookie.value);
+        // Obtain chosen resources from the target webpage
+        chrome.tabs.sendMessage(tab.id, {type: 'extract'}, function(links) {
             if (links.length) {
-                links = 'url: ' + links.join('<br/>url: ');
-                // Links are urldecoded when followed
-                window.open(('data:text/html, ' + configPrefix + links).replace(/%/g, '%25'));
+                output({options: options, links: links});
             }
             else {
-                alert('No items selected!');
+                // Won't work if synchronously: http://stackoverflow.com/q/18454818/2424184
+                setTimeout(function() {
+                    window.alert('No items selected!');
+                }, 0);
             }
         });
     });
