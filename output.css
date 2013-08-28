@@ -7,11 +7,18 @@ body {
     margin: 0 auto;
     background-color: #555;
 }
-textarea {
+#output {
     position: absolute;
-    top: 0;
-    bottom: 50%;
+    top: 1%;
+    bottom: 40%;
     left: 20%;
     right: 20%;
     font-family: monospace;
+}
+#control-panel {
+    position: absolute;
+    top: 62%;
+}
+#control-panel label {
+    margin-right: 2em;
 }

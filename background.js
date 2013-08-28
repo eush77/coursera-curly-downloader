@@ -42,7 +42,12 @@ chrome.pageAction.onClicked.addListener(function(tab) {
         // Obtain chosen resources from the target webpage
         chrome.tabs.sendMessage(tab.id, {type: 'extract'}, function(links) {
             if (links.length) {
-                output({options: options, links: links});
+                output({
+                    options: options,
+                    links: links.map(function(link) {
+                        return {title: link.title, value: 'url: ' + link.href};
+                    }),
+                });
             }
             else {
                 // Won't work if synchronously: http://stackoverflow.com/q/18454818/2424184

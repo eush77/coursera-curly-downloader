@@ -68,7 +68,7 @@ section.addEventListener('change', function(event) {
         var checkbox = event.target;
         if (checkbox.checked) {
             var links = [].slice.call(resourcesBar(checkbox.parentNode).children).map(function(a) {
-                return a.href;
+                return {title: a.title, href: a.href};
             });
         }
         else {
