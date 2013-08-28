@@ -3,7 +3,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var textarea = document.getElementById('output');
     var controlPanel = document.getElementById('control-panel');
 
-    // Formats selected by default
+    // Check if a format is selected by default
     var defaultFormat = new function(substrings) {
         return function(title) {
             title = title.toLowerCase();
@@ -13,7 +13,7 @@ window.addEventListener('DOMContentLoaded', function() {
         };
     }(['srt', 'video']);
 
-    // List of resources
+    // Make another list of resources
     var ResList = function(data) {
         return {
             // Filter object

@@ -6,6 +6,15 @@ var authCookie = 'session';
 //    data: '<data>'}  -- any (JSONifiable) payload
 //
 
+// Check if an url is rejected (forum entry, etc)
+var blacklistCheck = new function(blacklist) {
+    return function(url) {
+        return blacklist.every(function(re) {
+            return !re.test(url);
+        });
+    };
+}([/forum_id=\d+$/]);
+
 /** Generate Curl config options
  * @param {String} authValue Authorization cookie value.
  * @returns {Array}
@@ -46,7 +55,9 @@ chrome.runtime.onMessage.addListener(function(message, sender) {
         }, function(cookie) {
             output({
                 options: curlOptions(cookie.value),
-                links: links.map(function(link) {
+                links: links.filter(function(link) {
+                    return blacklistCheck(link.href);
+                }).map(function(link) {
                     return {title: link.title, value: 'url: ' + link.href};
                 }),
             });
