@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+ul {
+    margin: 0.1em;
+    -webkit-padding-start: 0;
+    list-style: none;
+    font: 1em/1.5em sans-serif;
+}
+li {
+    cursor: default;
+    white-space: nowrap;
+    border-bottom: 1px dotted black;
+}
+li:hover {
+    background-color: #ddd;
+}
+li.group-end {
+    border-bottom: 2px solid black;
+}
+li:last-child {
+    border-bottom: 0;
+}

@@ -30,9 +30,8 @@ window.addEventListener('DOMContentLoaded', function() {
                     input.type = 'checkbox';
                     input.checked = this.formats[title];
                     label.appendChild(input);
-                    label.onmousedown = function() {
-                        return false; // Disable incidental text selection
-                    };
+                    // Disable incidental text selection
+                    label.setAttribute('onmousedown', 'return false');
                     label.appendChild(document.createTextNode(title));
                     return label;
                 }.bind(this));

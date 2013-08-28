@@ -32,31 +32,26 @@ var output = function(data) {
     window.open('output.html');
 };
 
-// Page-action button behavior
-chrome.pageAction.onClicked.addListener(function(tab) {
-    chrome.cookies.get({
-        url: tab.url,
-        name: authCookie
-    }, function(cookie) {
-        var options = curlOptions(cookie.value);
-        // Obtain chosen resources from the target webpage
-        chrome.tabs.sendMessage(tab.id, {type: 'extract'}, function(links) {
-            if (links.length) {
-                output({
-                    options: options,
-                    links: links.map(function(link) {
-                        return {title: link.title, value: 'url: ' + link.href};
-                    }),
-                });
-            }
-            else {
-                // Won't work if synchronously: http://stackoverflow.com/q/18454818/2424184
-                setTimeout(function() {
-                    window.alert('No items selected!');
-                }, 0);
-            }
+// Catch links
+chrome.runtime.onMessage.addListener(function(message, sender) {
+    if (message.type == 'extracted') {
+        var links = message.data;
+        if (!links.length) {
+            window.alert('No items selected!');
+            return;
+        }
+        chrome.cookies.get({
+            url: sender.tab.url,
+            name: authCookie
+        }, function(cookie) {
+            output({
+                options: curlOptions(cookie.value),
+                links: links.map(function(link) {
+                    return {title: link.title, value: 'url: ' + link.href};
+                }),
+            });
         });
-    });
+    }
 });
 
 // Show page-action button

@@ -28,6 +28,7 @@ var Checkbox = (function(li) {
     var shiftRight = parseInt(window.getComputedStyle(li).paddingRight) * (1 - RIGHT_PADDING_PORTION);
     var shiftBottom = parseInt(window.getComputedStyle(resbar).paddingTop)
         + parseInt(window.getComputedStyle(icon).paddingTop);
+    var checkboxClass = 'curly-checkbox';
     // Make prototype
     var checkboxTemplate = document.createElement('input');
     checkboxTemplate.type = 'checkbox';
@@ -36,25 +37,16 @@ var Checkbox = (function(li) {
     checkboxTemplate.style.marginRight = -shiftRight + 'px'
     checkboxTemplate.style.marginTop = shiftBottom + 'px';
     checkboxTemplate.style.opacity = OPACITY;
-    checkboxTemplate.className = 'curly-checkbox';
+    checkboxTemplate.className = checkboxClass;
     // Return constructor
-    return function(index) {
+    var create = function(index) {
         var checkbox = checkboxTemplate.cloneNode();
         checkbox.dataset.index = index; // Set index attribute
         return checkbox;
     };
+    create.className = checkboxClass;
+    return create;
 }(lectures[0]));
-
-// Error handling
-var error = function(e) {
-    console.error(e.name + ': ' + e.message);
-};
-
-var InvalidMessageError = function(message) {
-    var error = new Error('"' + message + '"');
-    error.name = 'Invalid message';
-    return error;
-};
 
 // Create and embed checkboxes
 for (var index = 0; index < lectures.length; ++index) {
@@ -64,7 +56,7 @@ for (var index = 0; index < lectures.length; ++index) {
 
 // Handle clicks on checkboxes
 section.addEventListener('change', function(event) {
-    if (event.target.classList.contains('curly-checkbox')) {
+    if (event.target.classList.contains(Checkbox.className)) {
         var checkbox = event.target;
         if (checkbox.checked) {
             var links = [].slice.call(resourcesBar(checkbox.parentNode).children).map(function(a) {
@@ -78,20 +70,46 @@ section.addEventListener('change', function(event) {
     }
 });
 
-// Listen for messages
-chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
-    switch (message.type) {
-    case 'extract':
-        // Extract resource links for marked lectures.
+var actions = {
+    // Extract resource links for marked lectures
+    extract: function() {
         var arrayOfArrays = Object.keys(selected).filter(isFinite).sort(function(a, b) {
             return a - b;
         }).map(function(key) {
             return selected[key];
         });
         array = [].concat.apply([], arrayOfArrays);
-        sendResponse(array);
-        break;
-    default:
-        error(InvalidMessageError(message));
-    }
+        chrome.runtime.sendMessage(null, {type: 'extracted', data: array});
+    },
+    'select-all': function() {
+        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+            if (!checkbox.checked) {
+                checkbox.click();
+            }
+        });
+    },
+    'select-none': function() {
+        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+            if (checkbox.checked) {
+                checkbox.click();
+            }
+        });
+    },
+    'select-invert': function() {
+        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+            checkbox.click();
+        });
+    },
+    'select-new': function() {
+        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+            if (checkbox.parentNode.classList.contains('unviewed')) {
+                checkbox.click();
+            }
+        });
+    },
+};
+
+// Listen for messages
+chrome.runtime.onMessage.addListener(function(message) {
+    actions[message.type]();
 });
