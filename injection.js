@@ -55,20 +55,38 @@ for (var index = 0; index < lectures.length; ++index) {
 }
 
 // Handle clicks on checkboxes
-section.addEventListener('change', function(event) {
-    if (event.target.classList.contains(Checkbox.className)) {
-        var checkbox = event.target;
-        if (checkbox.checked) {
-            var links = [].slice.call(resourcesBar(checkbox.parentNode).children).map(function(a) {
+!function() {
+    var lastCheckedIndex;
+    // Simple state handler
+    var check = function(checkbox, index, changeState) {
+        if (changeState) {
+            checkbox.checked = !checkbox.checked;
+        }
+        selected[index] = checkbox.checked
+            ? [].slice.call(resourcesBar(checkbox.parentNode).children).map(function(a) {
                 return {title: a.title, href: a.href};
-            });
+            })
+        : []; // Can still be passed to concat
+    };
+    // Listener
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains(Checkbox.className)) {
+            var checkbox = event.target, index = +checkbox.dataset.index;
+            if (event.shiftKey && lastCheckedIndex != null && lastCheckedIndex != index) {
+                var delta = index < lastCheckedIndex ? +1 : -1;
+                for (var i = index + delta; i != lastCheckedIndex; i += delta) {
+                    checkbox = lectures[i].getElementsByClassName(Checkbox.className)[0];
+                    check(checkbox, i, true);
+                }
+            }
+            check(checkbox, lastCheckedIndex = index);
         }
         else {
-            var links = []; // Can still be passed to concat
+            // Forget last checkbox if clicked anywhere else
+            lastCheckedIndex = null;
         }
-        selected[checkbox.dataset.index] = links;
-    }
-});
+    });
+}();
 
 var actions = {
     // Extract resource links for marked lectures

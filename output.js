@@ -30,8 +30,9 @@ window.addEventListener('DOMContentLoaded', function() {
                     input.type = 'checkbox';
                     input.checked = this.formats[title];
                     label.appendChild(input);
-                    // Disable incidental text selection
-                    label.setAttribute('onmousedown', 'return false');
+                    label.onmousedown = function() {
+                        return false; // Disable incidental text selection
+                    };
                     label.appendChild(document.createTextNode(title));
                     return label;
                 }.bind(this));
@@ -81,5 +82,9 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     chrome.runtime.sendMessage(null, {type: 'output-ready'});
+
+    textarea.ondblclick = function() {
+        textarea.select();
+    };
 
 });
