@@ -1,4 +1,4 @@
-var matcher = new RegExp('^https?://class\.coursera\.org/.*/lecture/index/?$');
+var matcher = new RegExp('^https?://class\\.coursera\\.org/.*/lecture/index/?(\\?.+)?$');
 var authCookie = 'session';
 
 // Message format used throughout the extension:
@@ -46,6 +46,7 @@ chrome.runtime.onMessage.addListener(function(message, sender) {
     if (message.type == 'extracted') {
         var links = message.data;
         if (!links.length) {
+            chrome.runtime.sendMessage(null, {type: 'popup-close'});
             window.alert('No items selected!');
             return;
         }

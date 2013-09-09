@@ -49,21 +49,25 @@ var Checkbox = (function(li) {
 }(lectures[0]));
 
 // Create and embed checkboxes
-for (var index = 0; index < lectures.length; ++index) {
-    var li = lectures[index];
-    li.insertBefore(Checkbox(index), li.lastElementChild);
-}
+var checkboxes = [].map.call(lectures, function(li, index) {
+    var checkbox = Checkbox(index);
+    li.insertBefore(checkbox, li.lastElementChild);
+    return checkbox;
+});
 
 // Handle clicks on checkboxes
 !function() {
     var lastCheckedIndex;
     // Simple state handler
-    var check = function(checkbox, index, changeState) {
-        if (changeState) {
+    // Options: 'checkbox', 'index', 'changeState'. At least one of the first two is required.
+    var check = function(opts) {
+        var checkbox = opts.checkbox || checkboxes[opts.index];
+        var index = opts.index || checkbox.dataset.index;
+        if (opts.changeState) {
             checkbox.checked = !checkbox.checked;
         }
         selected[index] = checkbox.checked
-            ? [].slice.call(resourcesBar(checkbox.parentNode).children).map(function(a) {
+            ? [].map.call(resourcesBar(checkbox.parentNode).children, function(a) {
                 return {title: a.title, href: a.href};
             })
         : []; // Can still be passed to concat
@@ -71,15 +75,17 @@ for (var index = 0; index < lectures.length; ++index) {
     // Listener
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains(Checkbox.className)) {
-            var checkbox = event.target, index = +checkbox.dataset.index;
+            var targetCheckbox = event.target, index = +targetCheckbox.dataset.index;
             if (event.shiftKey && lastCheckedIndex != null && lastCheckedIndex != index) {
                 var delta = index < lastCheckedIndex ? +1 : -1;
                 for (var i = index + delta; i != lastCheckedIndex; i += delta) {
-                    checkbox = lectures[i].getElementsByClassName(Checkbox.className)[0];
-                    check(checkbox, i, true);
+                    var checkbox = checkboxes[i];
+                    check({index: i,
+                           changeState: true});
                 }
             }
-            check(checkbox, lastCheckedIndex = index);
+            check({checkbox: targetCheckbox,
+                   index: lastCheckedIndex = index});
         }
         else {
             // Forget last checkbox if clicked anywhere else
@@ -96,30 +102,30 @@ var actions = {
         }).map(function(key) {
             return selected[key];
         });
-        array = [].concat.apply([], arrayOfArrays);
+        var array = [].concat.apply([], arrayOfArrays);
         chrome.runtime.sendMessage(null, {type: 'extracted', data: array});
     },
     'select-all': function() {
-        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+        checkboxes.forEach(function(checkbox) {
             if (!checkbox.checked) {
                 checkbox.click();
             }
         });
     },
     'select-none': function() {
-        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+        checkboxes.forEach(function(checkbox) {
             if (checkbox.checked) {
                 checkbox.click();
             }
         });
     },
     'select-invert': function() {
-        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+        checkboxes.forEach(function(checkbox) {
             checkbox.click();
         });
     },
     'select-new': function() {
-        [].slice.call(section.getElementsByClassName(Checkbox.className)).forEach(function(checkbox) {
+        checkboxes.forEach(function(checkbox) {
             if (checkbox.parentNode.classList.contains('unviewed')) {
                 checkbox.click();
             }

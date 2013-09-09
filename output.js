@@ -24,7 +24,7 @@ window.addEventListener('DOMContentLoaded', function() {
             },
             // Create checkboxes and draw the form
             makeForm: function() {
-                checkboxes = Object.keys(this.formats).map(function(title) {
+                var checkboxes = Object.keys(this.formats).map(function(title) {
                     var label = document.createElement('label');
                     var input = document.createElement('input');
                     input.type = 'checkbox';
