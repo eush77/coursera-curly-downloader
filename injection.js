@@ -60,8 +60,15 @@ var checkboxContextMenu = new function() {
     var menu = document.createElement('iframe');
     menu.className = 'checkbox-context-menu';
     menu.style.display = 'none';
+    menu.style.boxSizing = 'content-box'; // "spark.main.css" defines it to be 'border-box'
     menu.src = chrome.extension.getURL('popup.html');
     document.body.appendChild(menu);
+    menu.hide = function() {
+        this.style.display = 'none';
+    };
+    menu.show = function() {
+        this.style.display = '';
+    };
     return menu;
 };
 
@@ -106,7 +113,7 @@ var checkboxContextMenu = new function() {
     document.addEventListener('contextmenu', function(event) {
         if (event.target.classList.contains(Checkbox.className)) {
             var checkbox = event.target;
-            checkboxContextMenu.style.display = '';
+            checkboxContextMenu.show();
             // Calculate position
             var x = event.clientX, y = event.clientY;
             if (x + checkboxContextMenu.offsetWidth > document.documentElement.clientWidth) {
@@ -125,7 +132,7 @@ var checkboxContextMenu = new function() {
     document.addEventListener('mouseup', function(event) {
         if (event.target != checkboxContextMenu
             && (event.which != 3 /*right*/ || !event.target.classList.contains(Checkbox.className))) {
-            checkboxContextMenu.style.display = 'none';
+            checkboxContextMenu.hide();
         }
     });
 }();
@@ -167,11 +174,15 @@ var actions = {
             }
         });
     },
+    'popup-size-announcement': function(message) {
+        checkboxContextMenu.style.width = message.width + 'px';
+        checkboxContextMenu.style.height = message.height + 'px';
+    },
 };
 
 // Listen for messages
 var receiveMessage = function(message) {
-    actions[message.type]();
+    actions[message.type](message);
 };
 // Extension-wide messages
 chrome.runtime.onMessage.addListener(receiveMessage);
@@ -179,5 +190,6 @@ chrome.runtime.onMessage.addListener(receiveMessage);
 window.addEventListener('message', function(event) {
     if (event.source == checkboxContextMenu.contentWindow) {
         receiveMessage(event.data);
+        checkboxContextMenu.hide(); // Hide menu if its item is clicked
     }
 });

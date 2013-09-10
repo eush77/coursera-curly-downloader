@@ -13,9 +13,25 @@ window.addEventListener('DOMContentLoaded', function() {
         return false;
     };
 
+    // Announce popup size for the top window if any
+    if (window != window.top) {
+        !function(WIDTH_FACTOR, HEIGHT_FACTOR) {
+            var announcedWidth = Math.max.apply(null, [].map.call(document.getElementsByTagName('li'), function(li) {
+                li.style.display = 'inline-block';
+                var width = li.offsetWidth;
+                li.style.display = '';
+                return width;
+            })) * WIDTH_FACTOR;
+            var announcedHeight = document.documentElement.offsetHeight * HEIGHT_FACTOR;
+            window.top.postMessage({type: 'popup-size-announcement',
+                                    width: announcedWidth,
+                                    height: announcedHeight}, '*');
+        }(1.2, 1);
+    }
+
     // Post message either extension-wide or personally to the top page
     //   (which incorporates this popup as its frame)
-    var post = window == top
+    var post = window == window.top
         ? function(action) {
             chrome.tabs.query({
                 active: true,
@@ -25,7 +41,7 @@ window.addEventListener('DOMContentLoaded', function() {
             });
         }
     : function(action) {
-        top.postMessage({type: action}, '*');
+        window.top.postMessage({type: action}, '*');
     };
 
     menu.onclick = function(event) {
