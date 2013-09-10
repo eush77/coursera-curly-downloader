@@ -59,17 +59,15 @@ var checkboxes = [].map.call(lectures, function(li, index) {
 var checkboxContextMenu = new function() {
     var menu = document.createElement('iframe');
     menu.className = 'checkbox-context-menu';
-    menu.style.display = 'none';
-    menu.style.boxSizing = 'content-box'; // "spark.main.css" defines it to be 'border-box'
     menu.src = chrome.extension.getURL('popup.html');
-    document.body.appendChild(menu);
     menu.hide = function() {
         this.style.display = 'none';
     };
     menu.show = function() {
         this.style.display = '';
     };
-    return menu;
+    menu.hide();
+    return document.body.appendChild(menu);
 };
 
 // Handle clicks on checkboxes

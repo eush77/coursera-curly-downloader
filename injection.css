@@ -1,6 +1,6 @@
 iframe.checkbox-context-menu {
     position: absolute;
-    width: 200px;
-    height: 250px;
+    box-sizing: content-box; /* "spark.main.css" defines it to be 'border-box' */
+    border: 2px ridge;
     background-color: white;
 }
