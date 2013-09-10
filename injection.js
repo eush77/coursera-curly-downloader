@@ -55,6 +55,16 @@ var checkboxes = [].map.call(lectures, function(li, index) {
     return checkbox;
 });
 
+// Checkbox context menu
+var checkboxContextMenu = new function() {
+    var menu = document.createElement('iframe');
+    menu.className = 'checkbox-context-menu';
+    menu.style.display = 'none';
+    menu.src = chrome.extension.getURL('popup.html');
+    document.body.appendChild(menu);
+    return menu;
+};
+
 // Handle clicks on checkboxes
 !function() {
     var lastCheckedIndex;
@@ -72,7 +82,7 @@ var checkboxes = [].map.call(lectures, function(li, index) {
             })
         : []; // Can still be passed to concat
     };
-    // Listener
+    // Checkbox selection
     document.addEventListener('click', function(event) {
         if (event.target.classList.contains(Checkbox.className)) {
             var targetCheckbox = event.target, index = +targetCheckbox.dataset.index;
@@ -90,6 +100,32 @@ var checkboxes = [].map.call(lectures, function(li, index) {
         else {
             // Forget last checkbox if clicked anywhere else
             lastCheckedIndex = null;
+        }
+    });
+    // Context menu director
+    document.addEventListener('contextmenu', function(event) {
+        if (event.target.classList.contains(Checkbox.className)) {
+            var checkbox = event.target;
+            checkboxContextMenu.style.display = '';
+            // Calculate position
+            var x = event.clientX, y = event.clientY;
+            if (x + checkboxContextMenu.offsetWidth > document.documentElement.clientWidth) {
+                x = Math.max(0, x - checkboxContextMenu.offsetWidth);
+            }
+            if (y + checkboxContextMenu.offsetHeight > document.documentElement.clientHeight) {
+                y = Math.max(0, y - checkboxContextMenu.offsetHeight);
+            }
+            checkboxContextMenu.style.left = window.pageXOffset + x + 'px';
+            checkboxContextMenu.style.top = window.pageYOffset + y + 'px';
+            // Hide default menu
+            event.preventDefault();
+        }
+    });
+    // Release context menu
+    document.addEventListener('mouseup', function(event) {
+        if (event.target != checkboxContextMenu
+            && (event.which != 3 /*right*/ || !event.target.classList.contains(Checkbox.className))) {
+            checkboxContextMenu.style.display = 'none';
         }
     });
 }();
@@ -134,6 +170,14 @@ var actions = {
 };
 
 // Listen for messages
-chrome.runtime.onMessage.addListener(function(message) {
+var receiveMessage = function(message) {
     actions[message.type]();
+};
+// Extension-wide messages
+chrome.runtime.onMessage.addListener(receiveMessage);
+// Context-menu messages
+window.addEventListener('message', function(event) {
+    if (event.source == checkboxContextMenu.contentWindow) {
+        receiveMessage(event.data);
+    }
 });

@@ -13,15 +13,24 @@ window.addEventListener('DOMContentLoaded', function() {
         return false;
     };
 
-    menu.onclick = function(event) {
-        if (event.target.tagName == 'LI') {
-            var action = event.target.dataset.action;
+    // Post message either extension-wide or personally to the top page
+    //   (which incorporates this popup as its frame)
+    var post = window == top
+        ? function(action) {
             chrome.tabs.query({
                 active: true,
                 currentWindow: true,
             }, function(tabs) {
                 chrome.tabs.sendMessage(tabs[0].id, {type: action});
             });
+        }
+    : function(action) {
+        top.postMessage({type: action}, '*');
+    };
+
+    menu.onclick = function(event) {
+        if (event.target.tagName == 'LI') {
+            post(event.target.dataset.action);
         }
     };
 

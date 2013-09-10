@@ -3,7 +3,7 @@
 
     "name": "Coursera: Curly Downloader",
     "description": "Extract resource links from Coursera lectures webpage. Generate a Curl configuration file which enables fast batch download.",
-    "version": "1.0",
+    "version": "1.0.5",
 
     "icons": {
         "128": "icon.png"
@@ -13,9 +13,12 @@
         "tabs", "cookies",
         "*://class.coursera.org/"
     ],
+    "web_accessible_resources": ["popup.html"],
+
     "content_scripts": [{
         "matches": ["*://class.coursera.org/*/lecture/index*"],
-        "js": ["injection.js"]
+        "js": ["injection.js"],
+        "css": ["injection.css"]
     }],
     "background": {
         "scripts": ["background.js"]
