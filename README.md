@@ -17,6 +17,8 @@ Extension popup menu also provides some ways to control the selection.
 
 ![](README.d/menu.png)
 
+This menu also arises as a checkbox context menu (on right click).
+
 ## Filtering
 
 Extracted links can be easily filtered by type.
