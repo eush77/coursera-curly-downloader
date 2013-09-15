@@ -47,7 +47,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 textarea.value = data.options.join('\n') + '\n\n' + data.links.filter(function(link) {
                     return this.formats[link.title];
                 }.bind(this)).map(function(link) {
-                    return link.value;
+                    return window.decodeURIComponent(link.value);
                 }).join('\n') + '\n';
                 return this;
             },
