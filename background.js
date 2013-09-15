@@ -1,5 +1,5 @@
 var matcher = new RegExp('^https?://class\\.coursera\\.org/.*/lecture/index/?(\\?.+)?$');
-var authCookie = 'session';
+var extensionName = 'Coursera: Curly Downloader';
 
 // Message format used throughout the extension:
 //   {type: '<type>',  -- string name
@@ -19,12 +19,43 @@ var blacklistCheck = new function(blacklist) {
  * @param {String} authValue Authorization cookie value.
  * @returns {Array}
  */
-var curlOptions = function(authValue) {
+var curlOptions = function(cookie) {
     return ['remote-name-all',
             'remote-header-name',
             'location',
-            'cookie: ' + authCookie + '=' + authValue];
+            'cookie: ' + cookie.name + '=' + cookie.value];
 };
+
+/** Obtain authentication cookie
+ * Try several times with different cookie names.
+ * @param {String} pageUrl
+ * @param {Function} callback
+ */
+var getAuthCookie = new function(authCookies) {
+    return function(pageUrl, callback) {
+        new function requestNextCookie() {
+            if (authCookies.length) {
+                chrome.cookies.get({
+                    url: pageUrl,
+                    name: authCookies[0]
+                }, function(cookie) {
+                    if (cookie == null) {
+                        authCookies.shift();
+                        requestNextCookie();
+                    }
+                    else {
+                        callback(cookie);
+                    }
+                });
+            }
+            else {
+                var message = 'Could not access authentication cookies!';
+                alert(message + '\n' + extensionName + ' breaks.');
+                throw new Error(message + ' Damn.');
+            }
+        };
+    };
+}(['session', 'CAUTH']);
 
 /** Open output page and send given data
  * @param {any} data
@@ -50,12 +81,9 @@ chrome.runtime.onMessage.addListener(function(message, sender) {
             window.alert('No items selected!');
             return;
         }
-        chrome.cookies.get({
-            url: sender.tab.url,
-            name: authCookie
-        }, function(cookie) {
+        getAuthCookie(sender.tab.url, function(cookie) {
             output({
-                options: curlOptions(cookie.value),
+                options: curlOptions(cookie),
                 links: links.filter(function(link) {
                     return blacklistCheck(link.href);
                 }).map(function(link) {
