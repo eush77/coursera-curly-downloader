@@ -20,5 +20,7 @@ body {
     top: 62%;
 }
 #control-panel label {
-    margin-right: 2em;
+    display: block;
+    margin-left: 1em;
+    line-height: 1.5em;
 }

@@ -24,7 +24,8 @@ var Checkbox = (function(li) {
     // Compute values
     var resbar = resourcesBar(li);
     var icon = resbar.getElementsByTagName('i')[0];
-    var size = icon.offsetHeight * CHECKBOX_SCALE;
+    // 'getComputedStyle(icon).width' remains the same for both folded and unfolded lecture items
+    var size = parseInt(window.getComputedStyle(icon).width) * CHECKBOX_SCALE;
     var shiftRight = parseInt(window.getComputedStyle(li).paddingRight) * (1 - RIGHT_PADDING_PORTION);
     var shiftBottom = parseInt(window.getComputedStyle(resbar).paddingTop)
         + parseInt(window.getComputedStyle(icon).paddingTop);
