@@ -4,14 +4,13 @@ window.addEventListener('DOMContentLoaded', function() {
     var controlPanel = document.getElementById('control-panel');
 
     // Check if a format is selected by default
-    var defaultFormat = new function(substrings) {
+    var defaultFormat = new function(matchers) {
         return function(title) {
-            title = title.toLowerCase();
-            return substrings.some(function(s) {
-                return title.indexOf(s) >= 0;
+            return matchers.some(function(re) {
+                return re.test(title);
             });
         };
-    }(['srt', 'video']);
+    }([/^subtitles\b.*\bsrt\b/i, /^video\b/i]);
 
     // Make another list of resources
     var ResList = function(data) {
