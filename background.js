@@ -1,4 +1,4 @@
-var matcher = new RegExp('^https?://class\\.coursera\\.org/.*/lecture/index/?(\\?.+)?$');
+var matcher = new RegExp('^https?://class\\.coursera\\.org/.*/lecture?(\\?.+)?$');
 var extensionName = 'Coursera: Curly Downloader';
 
 // Message format used throughout the extension:

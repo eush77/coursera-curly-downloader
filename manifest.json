@@ -16,7 +16,7 @@
     "web_accessible_resources": ["popup.html"],
 
     "content_scripts": [{
-        "matches": ["*://class.coursera.org/*/lecture/index*"],
+        "matches": ["*://class.coursera.org/*/lecture"],
         "js": ["injection.js"],
         "css": ["injection.css"]
     }],
