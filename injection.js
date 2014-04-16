@@ -168,7 +168,7 @@ var actions = {
     },
     'select-new': function() {
         checkboxes.forEach(function(checkbox) {
-            if (checkbox.parentNode.classList.contains('unviewed')) {
+            if (!checkbox.parentNode.classList.contains('unviewed') != !checkbox.checked) {
                 checkbox.click();
             }
         });
