@@ -50,4 +50,9 @@ window.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    menu.onmouseup = function(event) {
+        if (event.which == 3) {
+            event.target.click();
+        }
+    };
 });
