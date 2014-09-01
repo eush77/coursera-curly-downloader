@@ -145,6 +145,7 @@ var actions = {
             return selected[key];
         });
         var array = [].concat.apply([], arrayOfArrays);
+        this['select-none']();
         chrome.runtime.sendMessage(null, {type: 'extracted', data: array});
     },
     'select-all': function() {
